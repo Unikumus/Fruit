@@ -1,10 +1,10 @@
 import React from 'react';
-import {View, StyleSheet, ScrollView, AsyncStorage} from 'react-native';
+import {View, StyleSheet, FlatList, AsyncStorage} from 'react-native';
 import {ProductItem} from "../components/ProductItem";
-import FlatButton from "../components/button";
+import FlatButton from "../components/Button";
 import {useState, useEffect} from 'react';
 
-export default function Main (props) {
+export default function Home (props) {
 
     const [modalOpen, setModalOpen] = useState(false)
     const [state, setState] = useState({data: [{},]})
@@ -16,7 +16,8 @@ export default function Main (props) {
     const storeData = async (value) => {
         try {
             const jsonValue = JSON.stringify(value)
-            await AsyncStorage.setItem('My_Key_7', jsonValue)
+            // await AsyncStorage.clear()
+            await AsyncStorage.setItem('My_Key', jsonValue)
         } catch (e) {
             // saving error
         }
@@ -24,11 +25,10 @@ export default function Main (props) {
 
     const getData = async () => {
         try {
-            const jsonValue = await AsyncStorage.getItem('My_Key_7')
+            const jsonValue = await AsyncStorage.getItem('My_Key')
             if(jsonValue !== null) {
                 const value = JSON.parse(jsonValue)
                 setState(value)
-                console.log(jsonValue)
             }
             else {
                 setState(      {
@@ -74,18 +74,22 @@ export default function Main (props) {
         <View style={styles.container}>
 
             <View style={styles.itemContainer}>
-                <ScrollView >
-                    {state.data.map( (el) =>{
-                        return (
-                            <ProductItem  key = {el.key}
-                                inCart={el.inCart} id = {el.key}
-                                cartPressHandler={cartPressHandler}
-                                name = {el.name}
-                                price = {el.price}
-                                previewImage = {el.previewImage} />
-                        )
-                    })}
-                </ScrollView>
+
+               <FlatList
+               data={state.data}
+               renderItem={ ({item}) => (
+                   <ProductItem  key = {item.key}
+                                 inCart={item.inCart} id = {item.key}
+                                 cartPressHandler={cartPressHandler}
+                                 name = {item.name}
+                                 price = {item.price}
+                                 previewImage = {item.previewImage} />
+               )}
+
+               keyExtractor = { (item, index) => index.toString() }
+               />
+
+
             </View>
             <View style={styles.footer}>
 
